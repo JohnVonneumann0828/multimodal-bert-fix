@@ -1,5 +1,7 @@
+This is the fixed bert multimodal code that runs compatible with the latest versions of transformers... etc. 
 # multimodal-bert-fix
 citation:
+
 @inproceedings{rahman-etal-2020-integrating,
     title = "Integrating Multimodal Information in Large Pretrained Transformers",
     author = "Rahman, Wasifur  and
