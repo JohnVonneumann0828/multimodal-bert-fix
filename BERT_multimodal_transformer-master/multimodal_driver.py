@@ -250,7 +250,7 @@ def get_appropriate_dataset(data):
 
 
 def set_up_data_loader():
-    with open("D:\Epping_Boys_High_School\Project\mosei.pkl", "rb") as handle:
+    with open("/content/gdrive/MyDrive/BERT_multimodal_transformer/mosei.pkl", "rb") as handle:
         data = pickle.load(handle)
 
     train_data = data["train"]
@@ -506,7 +506,16 @@ def train(
                 epoch_i, train_loss, valid_loss, test_acc
             )
         )
-
+                # Additional information
+        EPOCH = epoch_i
+        PATH = "/content/gdrive/MyDrive/MAG_Model_Result/model.pth"
+        LOSS = valid_loss
+        torch.save({
+            'epoch': EPOCH,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': LOSS,
+            }, PATH)
         valid_losses.append(valid_loss)
         test_accuracies.append(test_acc)
 
