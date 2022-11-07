@@ -54,7 +54,7 @@ parser.add_argument("--warmup_proportion", type=float, default=0.1)
 parser.add_argument("--seed", type=seed, default="random")
 
 
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 
 def return_unk():
