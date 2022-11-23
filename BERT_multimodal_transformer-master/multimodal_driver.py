@@ -6,6 +6,7 @@ import os
 import random
 import pickle
 import sys
+from jax._src.array import Index
 import numpy as np
 from typing import *
 
@@ -87,10 +88,18 @@ def convert_to_features(examples, max_seq_length, tokenizer):
         a,label_id,segment=example
         words=a[0]
         visual=a[1]
-        acoustic=a[2]
+        acoustic=[a[2] for i in range(len(words))]
 
+        label_id=[list(a) for a in example[1]]
+        label_id=list(map(list, zip(*label_id)))
+        label_id=[sum(a)/len(a) for a in label_id]
+        one=[-1,-0.67,-0.33,0,0.33,0.67,1]
+        label_id=one[label_id.index(max(label_id))]
+        #label_id=list(map(list, zip(*label_id)))
+        #print(len(label_id))
         tokens, inversions = [], []
         for idx, word in enumerate(words):
+            word=word.decode("utf-8")          
             tokenized = tokenizer.tokenize(word)
             tokens.extend(tokenized)
             inversions.extend([idx] * len(tokenized))
@@ -100,8 +109,12 @@ def convert_to_features(examples, max_seq_length, tokenizer):
 
         aligned_visual = []
         aligned_audio = []
-
+        #print(type(visual))
+        #print(len(acoustic))
+        acoustic=np.array(acoustic)
+        #print(acoustic)
         for inv_idx in inversions:
+            #print(inv_idx)
             aligned_visual.append(visual[inv_idx, :])
             aligned_audio.append(acoustic[inv_idx, :])
 
@@ -250,8 +263,8 @@ def get_appropriate_dataset(data):
 
 
 def set_up_data_loader():
-    with open("/content/gdrive/MyDrive/BERT_multimodal_transformer/mosei.pkl", "rb") as handle:
-        data = pickle.load(handle)
+    f=open("/content/gdrive/MyDrive/Prepared_dataset/cmu-mosei.pkl", "rb")
+    data = pickle.load(f)
 
     train_data = data["train"]
     dev_data = data["dev"]
@@ -373,6 +386,7 @@ def train_epoch(model: nn.Module, train_dataloader: DataLoader, optimizer, sched
         )
         logits = outputs[0]
         loss_fct = MSELoss()
+        #print(label_ids)
         loss = loss_fct(logits.view(-1), label_ids.view(-1))
 
         if args.gradient_accumulation_step > 1:
